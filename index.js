@@ -1,6 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const token = "8078943288:AAGbDX6HcmZ3NaYejKMVAtPXO_NieDfOvgQ"
-const web_app = {url: "https://ya.ru"}
+const web_app = {url: "https://scrzt.netlify.app/"}
 const bot = new TelegramBot(token, {polling: true});
 
 // Matches "/echo [whatever]"

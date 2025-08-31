@@ -1,14 +1,21 @@
+import { useEffect } from 'react';
 import './App.css';
 
+const tg = window.Telegram.WebApp;
+
 function App() {
+  useEffect(() => {
+    tg.ready();
+  }, []);
+
+  const onClose = () => {
+    tg.close();
+  }
+
   return (
     <div className="App">
-      {window.Telegram.WebApp.initData.user ? (
-        <h1>Hello, {window.Telegram.WebApp.initData.user.first_name}!</h1>
-      ) : (
-        <h1>Hello, Guest!</h1>
-      )}
-      asdas
+      <h1>{tg.initData.user}</h1>
+      <button onClick={onClose}>Close</button>
     </div>
   );
 }
