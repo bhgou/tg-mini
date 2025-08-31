@@ -1,5 +1,160 @@
+/* Модальное окно */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal-window {
+  background: var(--tg-theme-bg-color, #fff);
+  border-radius: 16px;
+  padding: 32px 24px 24px 24px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+  min-width: 320px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.modal-window h3 {
+  margin-bottom: 8px;
+  font-size: 20px;
+  color: var(--tg-theme-text-color, #222);
+}
+.modal-window input[type="text"] {
+  border: 1px solid var(--tg-theme-hint-color, #ccc);
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 16px;
+  outline: none;
+  background: var(--tg-theme-secondary-bg-color, #f9f9f9);
+  color: var(--tg-theme-text-color, #222);
+}
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+.create-btn {
+  background: var(--tg-theme-button-color, #3390ec);
+  color: var(--tg-theme-button-text-color, #fff);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.create-btn:hover {
+  background: #1976d2;
+}
+.cancel-btn {
+  background: transparent;
+  color: var(--tg-theme-hint-color, #888);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 16px;
+  cursor: pointer;
+}
+.track-url {
+  word-break: break-all;
+  font-size: 15px;
+  color: var(--tg-theme-link-color, #1976d2);
+  margin-bottom: 4px;
+}
+/* Сетка для карточек треков */
+.tracks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin-top: 24px;
+}
+.track-card {
+  background: var(--tg-theme-secondary-bg-color, #fff);
+  border: 1px solid var(--tg-theme-hint-color, #ccc);
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 8px 6px 6px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: box-shadow 0.2s;
+  min-width: 0;
+  word-break: break-word;
+  width: 120px;
+  height: 120px;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+}
+.track-img {
+  width: 100%;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  background: #eee;
+}
+.track-title {
+  font-weight: 600;
+  font-size: 11px;
+  margin-bottom: 2px;
+  color: var(--tg-theme-text-color, #222);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+.track-desc {
+  font-size: 9px;
+  color: var(--tg-theme-hint-color, #666);
+  margin-bottom: 2px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+.track-url {
+  word-break: break-all;
+  font-size: 7px;
+  color: var(--tg-theme-link-color, #1976d2);
+  margin-bottom: 0;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+.track-card:focus-within {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+}
+.track-card input[type="text"] {
+  border: 1px solid var(--tg-theme-hint-color, #ccc);
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 7px;
+  color: var(--tg-theme-link-color, #1976d2);
+  margin-bottom: 0;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+  color: var(--tg-theme-text-color, #222);
+}
 *{
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+}
+
+body{
+  background: var(--tg-theme-bg-color);
+  color: var(--tg-theme-text-color);
 }
