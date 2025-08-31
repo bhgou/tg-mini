@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import TrackCard from './TrackCard';
+import ModalWindow from './modalWindow';
+import Recenzia from './recenzia';
 import './App.css';
 
 const tg = window.Telegram.WebApp;
@@ -13,6 +15,8 @@ function App() {
   const [tracks, setTracks] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [trackUrl, setTrackUrl] = useState("");
+  const [reviewTrack, setReviewTrack] = useState(null);
+  const [reviews, setReviews] = useState({});
 
   const openModal = () => {
     setShowModal(true);
@@ -58,32 +62,40 @@ function App() {
     <div className="App">
       <h1>{tg.initData.user}</h1>
       <button onClick={onClose}>Close</button>
-      <button onClick={openModal} style={{ marginTop: 16 }}>Добавить трек</button>
 
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-window">
-            <h3>Введите URL трека</h3>
-            <input
-              type="text"
-              value={trackUrl}
-              onChange={e => setTrackUrl(e.target.value)}
-              placeholder="https://..."
-              autoFocus
-            />
-            <div className="modal-actions">
-              <button onClick={handleCreateTrack} className="create-btn">Создать</button>
-              <button onClick={closeModal} className="cancel-btn">Отмена</button>
-            </div>
-          </div>
+
+      <ModalWindow show={showModal} title="Введите URL трека" onClose={closeModal}>
+        <input
+          type="text"
+          value={trackUrl}
+          onChange={e => setTrackUrl(e.target.value)}
+          placeholder="https://..."
+          autoFocus
+        />
+        <div className="modal-actions">
+          <button onClick={handleCreateTrack} className="btn create-btn">Создать</button>
         </div>
-      )}
+      </ModalWindow>
 
       <div className="tracks-grid">
         {tracks.map(track => (
-          <TrackCard key={track.id} {...track} />
+          <TrackCard key={track.id} {...track} onOpen={() => setReviewTrack(track)} />
         ))}
       </div>
+
+      {reviewTrack && (
+        <Recenzia
+          track={reviewTrack}
+          reviews={reviews}
+          setReviews={setReviews}
+          onClose={() => setReviewTrack(null)}
+        />
+      )}
+      <footer className="footer-bar">
+        <button className="btn add-btn" onClick={openModal} aria-label="Добавить трек">
+          <span style={{fontSize: 26, lineHeight: 1, fontWeight: 700, verticalAlign: 'middle'}}>+</span>
+        </button>
+      </footer>
     </div>
   );
 }
