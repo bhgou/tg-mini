@@ -49,7 +49,8 @@ function App() {
   const handleCreateTrack = async () => {
     if (trackUrl.trim() !== "") {
       const meta = await fetchTrackMeta(trackUrl);
-      setTracks([...tracks, { id: Date.now(), ...meta }]);
+      const id = Date.now();
+      setTracks(prev => [...prev, { id, ...meta }]);
       closeModal();
     }
   };
