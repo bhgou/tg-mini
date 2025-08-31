@@ -1,61 +1,129 @@
 
+
 import React, { useState } from 'react';
-import ModalWindow from './modalWindow';
+
+const tg = window.Telegram?.WebApp;
 
 function Recenzia({ track, reviews, setReviews, onClose }) {
   const [showAddReview, setShowAddReview] = useState(false);
   const [newReview, setNewReview] = useState("");
+  const [score, setScore] = useState(5);
+  const [genre, setGenre] = useState(5);
+  const [charisma, setCharisma] = useState(5);
+  const [style, setStyle] = useState(5);
+  const [vibe, setVibe] = useState(5);
+
+  const user = tg?.initDataUnsafe?.user || {};
 
   if (!track) return null;
 
   return (
-    <ModalWindow show={true} title={track.title || 'Рецензии'} onClose={() => { onClose(); setShowAddReview(false); setNewReview(""); }}>
-      <div style={{ marginBottom: 12 }}>
-        <b>{track.title || 'Без названия'}</b>
-        <div style={{ fontSize: 12, color: '#888' }}>{track.url}</div>
+    <div className="recenzia-fullscreen">
+      <button className="recenzia-close" onClick={() => { onClose(); setShowAddReview(false); setNewReview(""); }}>&times;</button>
+      <div className="recenzia-header">
+        <img className="recenzia-avatar" src={user.photo_url || 'https://ui-avatars.com/api/?name=' + (user.username || 'U')} alt="avatar" />
+        <div>
+          <div className="recenzia-username">{user.username || user.first_name || 'User'}</div>
+          <div className="recenzia-date">{new Date().toLocaleDateString()}</div>
+        </div>
       </div>
-      <div style={{ marginBottom: 16 }}>
+      <div className="recenzia-track">
+        <b>{track.title || 'Без названия'}</b>
+        <div className="recenzia-url">{track.url}</div>
+      </div>
+      <div className="recenzia-score-block">
+        <div className="recenzia-score-label">Общий балл:</div>
+        <div className="recenzia-score-value">{score}/10</div>
+        <input type="range" min="1" max="10" value={score} onChange={e => setScore(Number(e.target.value))} className="recenzia-slider" />
+      </div>
+      <div className="recenzia-sliders">
+        <div className="recenzia-slider-row">
+          <span>Индивидуальность жанра</span>
+          <input type="range" min="1" max="10" value={genre} onChange={e => setGenre(Number(e.target.value))} className="recenzia-slider" />
+          <span className="recenzia-slider-value">{genre}</span>
+        </div>
+        <div className="recenzia-slider-row">
+          <span>Харизма</span>
+          <input type="range" min="1" max="10" value={charisma} onChange={e => setCharisma(Number(e.target.value))} className="recenzia-slider" />
+          <span className="recenzia-slider-value">{charisma}</span>
+        </div>
+        <div className="recenzia-slider-row">
+          <span>Реализация стиля</span>
+          <input type="range" min="1" max="10" value={style} onChange={e => setStyle(Number(e.target.value))} className="recenzia-slider" />
+          <span className="recenzia-slider-value">{style}</span>
+        </div>
+        <div className="recenzia-slider-row">
+          <span>Вайб трека</span>
+          <input type="range" min="1" max="10" value={vibe} onChange={e => setVibe(Number(e.target.value))} className="recenzia-slider" />
+          <span className="recenzia-slider-value">{vibe}</span>
+        </div>
+      </div>
+      <form className="recenzia-form" onSubmit={e => {
+        e.preventDefault();
+        if (newReview.trim()) {
+          setReviews(prev => ({
+            ...prev,
+            [track.id]: [
+              ...(prev[track.id] || []),
+              {
+                text: newReview,
+                date: new Date().toLocaleDateString(),
+                score,
+                genre,
+                charisma,
+                style,
+                vibe,
+                user: {
+                  username: user.username,
+                  first_name: user.first_name,
+                  photo_url: user.photo_url
+                }
+              }
+            ]
+          }));
+          setNewReview("");
+          setShowAddReview(false);
+        }
+      }}>
+        <textarea
+          className="recenzia-textarea"
+          placeholder="Ваша рецензия..."
+          value={newReview}
+          onChange={e => setNewReview(e.target.value)}
+          autoFocus
+        />
+        <div className="recenzia-actions">
+          <button className="btn create-btn" type="submit">Сохранить</button>
+          <button className="btn cancel-btn" type="button" onClick={() => { setShowAddReview(false); setNewReview(""); }}>Отмена</button>
+        </div>
+      </form>
+      <div className="recenzia-list-block">
         <b>Рецензии:</b>
-        <ul style={{ paddingLeft: 18, margin: 0, marginTop: 6, marginBottom: 6, maxHeight: 120, overflowY: 'auto' }}>
+        <ul className="recenzia-list">
           {(reviews[track.id]?.length > 0)
             ? reviews[track.id].map((r, i) => (
-                <li key={i} style={{ fontSize: 13, marginBottom: 4 }}>
-                  {r.text} <span style={{ color: '#aaa', fontSize: 11 }}>({r.date})</span>
+                <li key={i} className="recenzia-list-item">
+                  <div className="recenzia-list-header">
+                    <img className="recenzia-avatar" src={r.user?.photo_url || 'https://ui-avatars.com/api/?name=' + (r.user?.username || 'U')} alt="avatar" />
+                    <div>
+                      <div className="recenzia-username">{r.user?.username || r.user?.first_name || 'User'}</div>
+                      <div className="recenzia-date">{r.date}</div>
+                    </div>
+                    <div className="recenzia-score-value">{r.score}/10</div>
+                  </div>
+                  <div className="recenzia-list-text">{r.text}</div>
+                  <div className="recenzia-list-sliders">
+                    <span>Индивидуальность жанра: <b>{r.genre}</b></span>
+                    <span>Харизма: <b>{r.charisma}</b></span>
+                    <span>Реализация стиля: <b>{r.style}</b></span>
+                    <span>Вайб трека: <b>{r.vibe}</b></span>
+                  </div>
                 </li>
               ))
-            : <li style={{ color: '#aaa', fontSize: 13 }}>Пока нет рецензий</li>}
+            : <li className="recenzia-list-item" style={{ color: '#aaa' }}>Пока нет рецензий</li>}
         </ul>
-        {!showAddReview && (
-              <button className="btn create-btn" style={{ fontSize: 14, padding: '6px 14px' }} onClick={() => setShowAddReview(true)}>Добавить рецензию</button>
-        )}
       </div>
-      {showAddReview && (
-        <form onSubmit={e => {
-          e.preventDefault();
-          if (newReview.trim()) {
-            setReviews(prev => ({
-              ...prev,
-              [track.id]: [
-                ...(prev[track.id] || []),
-                { text: newReview, date: new Date().toLocaleDateString() }
-              ]
-            }));
-            setNewReview("");
-            setShowAddReview(false);
-          }
-        }}>
-          <textarea
-            style={{ width: '100%', minHeight: 60, borderRadius: 8, padding: 8, marginBottom: 8 }}
-            placeholder="Ваша рецензия..."
-            value={newReview}
-            onChange={e => setNewReview(e.target.value)}
-            autoFocus
-          />
-              <button className="btn create-btn" type="submit">Сохранить</button>
-              <button className="btn cancel-btn" type="button" onClick={() => { setShowAddReview(false); setNewReview(""); }}>Отмена</button>
-        </form>
-      )}
-    </ModalWindow>
+    </div>
   );
 }
 

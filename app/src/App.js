@@ -92,9 +92,7 @@ function App() {
         />
       )}
       <footer className="footer-bar">
-        <button className="btn add-btn" onClick={openModal} aria-label="Добавить трек">
-          <span style={{fontSize: 26, lineHeight: 1, fontWeight: 700, verticalAlign: 'middle'}}>+</span>
-        </button>
+  <button className="btn add-btn" onClick={openModal} aria-label="Добавить трек">+</button>
       </footer>
     </div>
   );
