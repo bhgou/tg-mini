@@ -1,8 +1,21 @@
+import { useEffect } from 'react';
+import API_CFG from './api.cfg';
 import React, { useState } from 'react';
 
 const tg = window.Telegram?.WebApp;
 
 function Recenzia({ track, reviews, setReviews, onClose }) {
+  useEffect(() => {
+    if (!track) return;
+    async function fetchRecenzii() {
+  const res = await fetch(API_CFG.BASE + API_CFG.RECENZII);
+      const all = await res.json();
+      // Фильтруем только рецензии для текущего трека
+      const filtered = all.filter(r => r.id === track.id);
+      setReviews(prev => ({ ...prev, [track.id]: filtered }));
+    }
+    fetchRecenzii();
+  }, [track, setReviews]);
   const [showAddReview, setShowAddReview] = useState(false);
   const [newReview, setNewReview] = useState("");
   const [score, setScore] = useState(5);
@@ -17,7 +30,7 @@ function Recenzia({ track, reviews, setReviews, onClose }) {
 
   // Добавить рецензию в API
   async function addRecenziaToApi(recenziaObj) {
-    await fetch('http://localhost:5230/api/list/addRecenzia', {
+  await fetch(API_CFG.BASE + API_CFG.ADD_RECENZIA, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify([recenziaObj])
