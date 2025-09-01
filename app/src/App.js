@@ -9,8 +9,8 @@ const tg = window.Telegram.WebApp;
 function App() {
   useEffect(() => {
     tg.ready();
+    fetchTracksFromApi();
   }, []);
-
 
   const [tracks, setTracks] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -28,9 +28,16 @@ function App() {
     setTrackUrl("");
   };
 
+  // Универсальная функция обхода блокировок (SoundCloud и др.)
+  function fetchWithProxy(url, options) {
+    const isBlocked = url.includes('soundcloud.com');
+    const proxy = 'https://corsproxy.io/?';
+    return fetch(isBlocked ? proxy + encodeURIComponent(url) : url, options);
+  }
+
   async function fetchTrackMeta(url) {
     try {
-      const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
+      const res = await fetchWithProxy(url);
       const html = await res.text();
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
@@ -49,14 +56,38 @@ function App() {
   const handleCreateTrack = async () => {
     if (trackUrl.trim() !== "") {
       const meta = await fetchTrackMeta(trackUrl);
-      const id = Date.now();
+      // Получаем все треки и вычисляем максимальный id
+      const res = await fetch('http://localhost:5230/api/list/tracks');
+      const allTracks = await res.json();
+      let id = 1;
+      if (Array.isArray(allTracks) && allTracks.length > 0) {
+        id = Math.max(...allTracks.map(t => t.id || 0)) + 1;
+      }
       setTracks(prev => [...prev, { id, ...meta }]);
       closeModal();
+      // Отправляем массив, как ожидает backend
+      await fetch('http://localhost:5230/api/list/addtrack', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify([{ id, url: trackUrl }])
+      });
     }
   };
-
+  
   const onClose = () => {
     tg.close();
+  }
+
+  async function fetchTracksFromApi() {
+    try {
+      const res = await fetch('http://localhost:5230/api/list/tracks');
+      if (!res.ok) throw new Error('Ошибка загрузки треков');
+      const apiTracks = await res.json();
+      setTracks(apiTracks);
+    } catch (e) {
+      // Можно добавить обработку ошибки
+      setTracks([]);
+    }
   }
 
   return (

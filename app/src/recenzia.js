@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 
 const tg = window.Telegram?.WebApp;
@@ -16,6 +14,15 @@ function Recenzia({ track, reviews, setReviews, onClose }) {
   const user = tg?.initDataUnsafe?.user || {};
 
   if (!track) return null;
+
+  // Добавить рецензию в API
+  async function addRecenziaToApi(recenziaObj) {
+    await fetch('http://localhost:5230/api/list/addRecenzia', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify([recenziaObj])
+    });
+  }
 
   return (
     <div className="recenzia-fullscreen">
@@ -67,7 +74,9 @@ function Recenzia({ track, reviews, setReviews, onClose }) {
           <div className="recenzia-score-block">
             <div className="recenzia-score-label">Общий балл:</div>
             <div className="recenzia-score-value">{score}/10</div>
-            <input type="range" min="1" max="10" value={score} onChange={e => setScore(Number(e.target.value))} className="recenzia-slider" />
+            <div className="recenzia-score-range">
+              <input type="range" min="1" max="10" value={score} onChange={e => setScore(Number(e.target.value))} className="recenzia-slider" />
+            </div>
           </div>
           <div className="recenzia-sliders">
             <div className="recenzia-slider-row">
@@ -91,27 +100,24 @@ function Recenzia({ track, reviews, setReviews, onClose }) {
               <span className="recenzia-slider-value">{vibe}</span>
             </div>
           </div>
-          <form className="recenzia-form" onSubmit={e => {
+          <form className="recenzia-form" onSubmit={async e => {
             e.preventDefault();
             if (newReview.trim()) {
+              const recenziaObj = {
+                id: track.id,
+                name: user.username || user.first_name || "User",
+                date: new Date().toLocaleDateString(),
+                text: newReview,
+                individ: genre,
+                harizma: charisma,
+                vibe: vibe
+              };
+              await addRecenziaToApi(recenziaObj);
               setReviews(prev => ({
                 ...prev,
                 [track.id]: [
                   ...(prev[track.id] || []),
-                  {
-                    text: newReview,
-                    date: new Date().toLocaleDateString(),
-                    score,
-                    genre,
-                    charisma,
-                    style,
-                    vibe,
-                    user: {
-                      username: user.username,
-                      first_name: user.first_name,
-                      photo_url: user.photo_url
-                    }
-                  }
+                  recenziaObj
                 ]
               }));
               setNewReview("");
